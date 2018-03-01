@@ -4,7 +4,7 @@ Get the latest pothole complaints from NYC 311 data.
 
 ## Getting started
 
-<a href="https://asciinema.org/a/BKSko6AGQclfJ28WcwHwKk2Ex?autoplay=1"><img src="https://asciinema.org/a/BKSko6AGQclfJ28WcwHwKk2Ex.png" width="836"/></a>
+<a href="https://asciinema.org/a/BKSko6AGQclfJ28WcwHwKk2Ex?autoplay=1&&theme=solarized-dark"><img src="https://asciinema.org/a/BKSko6AGQclfJ28WcwHwKk2Ex.png" width="600"/></a>
 
 ```bash
 # download the repo
