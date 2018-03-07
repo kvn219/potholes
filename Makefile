@@ -1,7 +1,7 @@
 all: compile docker push clean
 
 compile:
-		@echo compile
+	@echo compile
 
 docker:
 	@echo docker
@@ -15,4 +15,7 @@ clean:
 
 video:
 	@echo make video!
-	docker run --rm -v $(PWD):/data asciinema/asciicast2gif -t asciinema -s 1 -S 2 -w 200 -h 40 potholes/demo.cast demo.gif
+	asciinema rec
+
+gif:
+	docker run --rm -v $(PWD):/data asciinema/asciicast2gif -t asciinema -s 1 -S 1 -w 100 -h 50 167872.cast demo.gif
