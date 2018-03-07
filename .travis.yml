@@ -1,0 +1,11 @@
+language: go
+go:
+  - "1.10.x"
+  - master
+os: osx
+matrix:
+  allow_failures:
+    - go: master
+  fast_finish: true
+script:
+  go run potholes/main.go
