@@ -3,15 +3,21 @@ all: compile docker push clean
 compile:
 	@echo compile
 
-docker:
-	@echo docker
-	docker build --force-rm=true -t kvn219/potholes:single .
+docker_build:
+	@echo building docker image
+	docker build --force-rm=true -t kvn219/potholes .
+
+docker_run:
+	@echo run docker container
+	docker run --name potholes --rm -v $(pwd):/go/src/potholes/outputs -it -d kvn219/potholes
+	docker exec -it potholes sh
 
 push:
 	@echo push
 
 clean:
 	@echo clean
+	docker rmi $(docker images -q --filter "dangling=true") -f
 
 video:
 	@echo make video!
