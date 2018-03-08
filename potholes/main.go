@@ -42,7 +42,7 @@ func main() {
 	err := json.Unmarshal(body, &complaint)
 	checkError("Cannot Unmarshall json!\n", err)
 	// Create output file.
-	file := createFile("./outputs/results.csv")
+	file := createFile("results.csv")
 	// Wait until file creation is finished.
 	defer file.Close()
 	// Create a csv writer.
