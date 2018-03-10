@@ -33,16 +33,39 @@ type Complaint struct {
 
 func main() {
 	fmt.Println("Getting the latest NYC pothole complaints...")
-	resp := getReqFromSocrata()
+	// User arguments
+	l := flag.Int("limit", 3, "Number of records to pull.")
+	o := flag.String("order", "DESC", "Sort records in {DESC|ASC} order.")
+	// Parse user arguments
+	flag.Parse()
+	// Construct the query string.
+	baseURL := "https://data.cityofnewyork.us/resource/fhrw-4uyv.json"
+	complainType := "?$where=descriptor%20=%20%27Pothole%27"
+	limit := fmt.Sprintf("&$limit=%d", *l)
+	orderBy := fmt.Sprintf("&$order=created_date %s", *o)
+	orderByFmt := strings.Replace(orderBy, " ", "%20", -1)
+	// Combine the base url and query strings
+	url := baseURL + complainType + limit + orderByFmt
+	fmt.Println(url)
+	resp := getReqFromSocrata(url)
+	defer resp.Body.Close()
 	// Read response from Socrata.
-	body := readResp(resp)
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal("Cannot read response body.", err)
+	}
 	// Initialize complaint data type.
 	complaint := []Complaint{}
 	// Unmarshall request.
-	err := json.Unmarshal(body, &complaint)
-	checkError("Cannot Unmarshall json!\n", err)
+	err = json.Unmarshal(body, &complaint)
+	if err != nil {
+		log.Fatal("Cannot Unmarshall json!\n", err)
+	}
 	// Create output file.
-	file := createFile("results.csv")
+	file, err := os.Create("results.csv")
+	if err != nil {
+		log.Fatal("Cannot create file", err)
+	}
 	// Wait until file creation is finished.
 	defer file.Close()
 	// Create a csv writer.
@@ -107,54 +130,17 @@ func main() {
 		record = append(record, complaint[idx].Longitude)
 		// Write row to csv file.
 		err := writer.Write(record)
-		checkError("Cannot write to file", err)
-	}
-}
-
-// userArgs grabs user arguments from the command line.
-func userArgs() string {
-	// Limit of records.
-	l := flag.Int("limit", 10, "Number of records to pull.")
-	// Order inwhich to sort the records.
-	o := flag.String("order", "DESC", "Sort records in {DESC|ASC} order.")
-	flag.Parse()
-	// Construct the query string.
-	baseURL := "https://data.cityofnewyork.us/resource/fhrw-4uyv.json"
-	complainType := "?$where=descriptor%20=%20%27Pothole%27"
-	limit := fmt.Sprintf("&$limit=%d", *l)
-	orderBy := fmt.Sprintf("&$order=created_date %s", *o)
-	orderByFmt := strings.Replace(orderBy, " ", "%20", -1)
-	// Combine the base url and query strings
-	url := baseURL + complainType + limit + orderByFmt
-	return url
-}
-
-// checkError checks and log errors.
-func checkError(message string, err error) {
-	if err != nil {
-		log.Fatal(message, err)
+		if err != nil {
+			log.Fatal("Cannot write to file", err)
+		}
 	}
 }
 
 // getReqFromSocrata grabs user arguments and makes a request.
-func getReqFromSocrata() *http.Response {
-	url := userArgs()
+func getReqFromSocrata(url string) *http.Response {
 	resp, err := http.Get(url)
-	checkError("Cannot get request from Sorcrata!", err)
+	if err != nil {
+		log.Fatal("Cannot get request from Sorcrata!", err)
+	}
 	return resp
-}
-
-// readResp reads the response body and checks for errors.
-func readResp(resp *http.Response) []byte {
-	body, err := ioutil.ReadAll(resp.Body)
-	checkError("Cannot read response body.", err)
-	defer resp.Body.Close()
-	return body
-}
-
-// createFile creates a file and checks for errors.
-func createFile(fname string) *os.File {
-	file, err := os.Create(fname)
-	checkError("Cannot create file", err)
-	return file
 }
