@@ -25,3 +25,9 @@ video:
 
 gif:
 	docker run --rm -v $(PWD):/data asciinema/asciicast2gif -t asciinema -s 1 -S 1 -w 100 -h 50 167872.cast demo.gif
+
+
+test:
+	go test ./... -coverprofile=coverage.out
+	go tool cover -func=coverage.out
+	go tool cover -html=coverage.out
