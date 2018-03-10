@@ -8,4 +8,5 @@ matrix:
     - go: master
   fast_finish: true
 script:
+  go test ./... -covermode=atomic
   go run potholes/main.go
